@@ -1,0 +1,43 @@
+.venv/
+__pycache__/
+*.pyc
+
+web/node_modules/
+web/dist/
+static/dist/
+
+build/
+release/
+ml/runs/*
+!ml/runs/loo.md
+
+ml/runs/boundary_exports/
+
+# local fallback copies; the same content is in git under its tag
+backup/
+
+# orchestrator scratch state (subagent-driven-development ledger)
+.superpowers/
+
+# downloaded driver binary for tools/render-check/zen_grab.py, not the checked-in harness scripts
+tools/render-check/geckodriver.exe
+
+# generated screenshot output directories, not the checked-in harness scripts
+tools/render-check/out_*/
+
+# local harness state and a generated build log
+.claude/
+build_release.log
+
+# Captures and ground truth stay local: the public repo ships source only and
+# users bring their own captures. Tests that need them are marked `data` and skip.
+data/
+
+# Local-only working files: agent guidance, agent prompts and design-tool state
+/CLAUDE.md
+.impeccable/
+docs/superpowers/
+docs/plans/2026-09-18-HANDOVER.md
+docs/plans/2026-09-19-trigger-prompts.md
+docs/plans/_retrain-kickoff-prompt.md
+docs/specs/2026-09-02-batch-gallery-overlap-prompt.md

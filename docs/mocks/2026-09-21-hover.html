@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en" data-theme="dark-default">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hover feel — pick one per section</title>
+<style>
+/* ---------------------------------------------------------------------------
+   Tokens copied by value out of web/src/index.css. Nothing here links to the
+   app: this file is a standalone mock and cannot affect the build.
+   Dark = the app's :root default. Light = the app's [data-theme="paper"].
+--------------------------------------------------------------------------- */
+:root {
+  --bg:#0b0f14; --panel:#111823; --panel2:#0e141d; --line:#1e2937;
+  --text:#dbe4ee; --dim:#8fa1b5; --accent:#51d98b; --accent-dim:#2e7d54;
+  --amber:#e8b45a; --danger:#e86a6a; --on-accent:#eafff3;
+  --shadow:rgba(0,0,0,.7);
+  color-scheme: dark;
+}
+:root[data-theme="paper"] {
+  color-scheme: light;
+  --bg:#ffffff; --panel:#f5f5f5; --panel2:#ffffff; --line:#c7c7c7;
+  --text:#0a0a0a; --dim:#4f4f4f; --accent:#2563eb;
+  --accent-dim: color-mix(in srgb, var(--accent) 75%, var(--text));
+  --amber:#a75c00; --danger:#e7000b; --on-accent:#fafafa;
+  --shadow: rgba(0,0,0,.22);
+}
+/* Derived once, for every theme (index.css). */
+:root {
+  --line-hi: color-mix(in srgb, var(--line) 55%, var(--dim));
+  --panel-hover: color-mix(in srgb, var(--panel2) 88%, var(--text));
+  --radius: .625rem;
+  --primary: var(--accent-dim);
+  --brand: var(--accent);
+  --ring: var(--accent);
+}
+
+/* --- page chrome ---------------------------------------------------------- */
+* { box-sizing: border-box; }
+body {
+  margin:0; padding:28px 32px 56px;
+  background: var(--bg); color: var(--text);
+  font: 14px/1.5 "Instrument Sans", ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+h1 { font-size:20px; margin:0 0 6px; }
+h2 { font-size:15px; margin:0 0 12px; letter-spacing:.02em; }
+p  { margin:0 0 8px; max-width:78ch; color:var(--dim); }
+p b, p strong { color: var(--text); }
+code, .mono { font-family:"IBM Plex Mono", ui-monospace, monospace; }
+
+.head {
+  display:flex; align-items:flex-start; gap:20px; justify-content:space-between;
+  padding-bottom:18px; margin-bottom:26px; border-bottom:1px solid var(--line);
+}
+.switch {
+  flex:none; cursor:pointer; padding:8px 14px; border-radius:var(--radius);
+  border:1px solid transparent; box-shadow: inset 0 0 0 1px var(--line);
+  background: var(--panel); color: var(--text); font: inherit;
+  transition: box-shadow 150ms ease-out, background-color 150ms ease-out;
+}
+.switch:hover { background: var(--panel-hover); box-shadow: inset 0 0 0 1px var(--line-hi); }
+
+section { margin-bottom:46px; }
+.row { display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start; }
+.variant { width:252px; }
+.chip {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:30px; height:30px; margin-bottom:8px; border-radius:var(--radius);
+  border:1px solid transparent; box-shadow: inset 0 0 0 1px var(--line-hi);
+  background: var(--panel); color: var(--brand);
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:16px; font-weight:600;
+}
+.vtitle { font-size:13px; font-weight:600; margin:0 0 10px; color:var(--text); }
+.recipe {
+  margin-top:10px; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:11px; line-height:1.5; color:var(--dim); white-space:pre-wrap;
+}
+.recipe .k { color: var(--text); }
+.note {
+  margin-top:10px; padding:12px 14px; border-radius:var(--radius);
+  border:1px solid transparent; box-shadow: inset 0 0 0 1px var(--line);
+  background: var(--panel); color: var(--dim); font-size:12.5px; max-width:82ch;
+}
+.note b { color: var(--text); }
+
+/* =========================================================================
+   SECTION 1 - the gallery tile
+   Base geometry lifted from GalleryGrid.tsx: rounded-[var(--radius)],
+   border-transparent + inset ring, bg-panel2, a 4/3 media box on bg-panel,
+   a count badge, and a one-line footer over border-t border-line.
+   ========================================================================= */
+.tile {
+  display:block; position:relative; width:100%; overflow:hidden;
+  border-radius: var(--radius);
+  border:1px solid transparent;               /* hairline rule: never coloured */
+  box-shadow: inset 0 0 0 1px var(--line);    /* the line is this inset ring   */
+  background: var(--panel2); text-align:left; cursor:pointer;
+  padding:0; color:inherit; font:inherit;
+}
+.tile:focus-visible {
+  outline:none;
+  box-shadow: inset 0 0 0 1px var(--line), 0 0 0 3px color-mix(in srgb, var(--ring) 50%, transparent);
+}
+.media { position:relative; aspect-ratio:4/3; overflow:hidden; background:var(--panel); }
+/* The thumbnail: a CSS-only stand-in for a grayscale hemocytometer capture.
+   No file from data/ is read or embedded. Identical in all four variants. */
+.shot {
+  position:absolute; inset:0;
+  background-color:#20262e;
+  background-image:
+    radial-gradient(circle at 21% 29%, rgba(255,255,255,.60) 0 2px, transparent 3px),
+    radial-gradient(circle at 37% 62%, rgba(255,255,255,.52) 0 2px, transparent 3px),
+    radial-gradient(circle at 63% 21%, rgba(255,255,255,.46) 0 2px, transparent 3px),
+    radial-gradient(circle at 74% 55%, rgba(255,255,255,.58) 0 2px, transparent 3px),
+    radial-gradient(circle at 52% 44%, rgba(255,255,255,.40) 0 2px, transparent 3px),
+    radial-gradient(circle at 86% 78%, rgba(255,255,255,.50) 0 2px, transparent 3px),
+    radial-gradient(circle at 15% 81%, rgba(255,255,255,.44) 0 2px, transparent 3px),
+    radial-gradient(circle at 44% 88%, rgba(255,255,255,.36) 0 2px, transparent 3px),
+    repeating-linear-gradient(0deg,  rgba(255,255,255,.13) 0 1px, transparent 1px 31px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.13) 0 1px, transparent 1px 31px),
+    linear-gradient(140deg, #2d353f 0%, #171c23 100%);
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+                     no-repeat, no-repeat, repeat, repeat, no-repeat;
+}
+.badge {
+  position:absolute; top:8px; right:8px; padding:1px 8px; border-radius:999px;
+  background: rgba(0,0,0,.65);
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:13px; font-weight:600; font-variant-numeric: tabular-nums; color:#fff;
+}
+.foot { border-top:1px solid var(--line); padding:8px 10px; }
+.fname { font-size:13px; line-height:1.15; color:var(--text);
+         white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ---- A: as shipped (GalleryGrid.tsx) ---- */
+.v-a .tile {
+  transition: transform 260ms cubic-bezier(.16,1,.3,1),
+              box-shadow 260ms cubic-bezier(.16,1,.3,1);
+}
+.v-a .tile:hover {
+  transform: translateY(-3px);
+  box-shadow: inset 0 0 0 1px var(--line-hi), 0 14px 30px -20px var(--shadow);
+}
+.v-a .shot {
+  transition: opacity 420ms cubic-bezier(.16,1,.3,1),
+              transform 420ms cubic-bezier(.16,1,.3,1);
+}
+.v-a .tile:hover .shot { transform: scale(1.035); }
+
+/* ---- B: one idea - a fade. Nothing moves. ---- */
+.v-b .tile { transition: box-shadow 160ms cubic-bezier(.2,.8,.2,1); }
+.v-b .tile:hover { box-shadow: inset 0 0 0 1px var(--line-hi), 0 10px 24px -18px var(--shadow); }
+.v-b .shot { opacity:.86; transition: opacity 160ms cubic-bezier(.2,.8,.2,1); }
+.v-b .tile:hover .shot { opacity:1; }
+
+/* ---- C: one idea - a small lift. ---- */
+.v-c .tile {
+  transition: transform 160ms cubic-bezier(.2,.8,.2,1),
+              box-shadow 160ms cubic-bezier(.2,.8,.2,1);
+}
+.v-c .tile:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 0 0 1px var(--line-hi), 0 12px 26px -18px var(--shadow);
+}
+
+/* ---- D: one idea - the image breathes, the frame does not. ---- */
+.v-d .tile { transition: box-shadow 200ms cubic-bezier(.2,.8,.2,1); }
+.v-d .tile:hover { box-shadow: inset 0 0 0 1px var(--line-hi); }
+.v-d .shot { transition: transform 200ms cubic-bezier(.2,.8,.2,1); }
+.v-d .tile:hover .shot { transform: scale(1.015); }
+
+/* =========================================================================
+   SECTION 2 - the quality slider
+   Geometry from QualitySlider.tsx + ui/slider.tsx: the word, a track with
+   three stops drawn on a 3px groove, a 16px white handle carrying an inset
+   ring in --primary, and the rung's name in 6ch of mono --brand.
+   Three rungs only: Quick (1), Normal (2, the default), Finest (3).
+   ========================================================================= */
+.qs { display:flex; align-items:center; gap:12px; padding:9px 12px; min-height:46px;
+      border-radius:var(--radius); border:1px solid transparent;
+      box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); }
+.qs-cap { font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10px;
+          letter-spacing:.14em; text-transform:uppercase; color:var(--dim); flex:none; }
+.qs-wrap { position:relative; display:flex; align-items:center; width:126px; height:16px; flex:none; }
+.qs-groove { position:absolute; left:0; right:0; height:3px; border-radius:999px; background:var(--line); }
+.qs-fill   { position:absolute; left:0; width:50%; height:3px; border-radius:999px; background:var(--primary); }
+.qs-dots { position:absolute; left:0; right:0; display:flex; align-items:center; justify-content:space-between; }
+.qs-dot { position:relative; width:7px; height:7px; border-radius:999px; background:var(--line);
+          transition: background-color 150ms cubic-bezier(.4,0,.2,1); }
+.qs-dot.on { background: var(--primary); }
+.qs-thumb {
+  position:absolute; left:50%; margin-left:-8px; width:16px; height:16px;
+  border-radius:999px; background:#fff; cursor:pointer;
+  border:1px solid transparent;                                   /* hairline rule */
+  box-shadow: inset 0 0 0 1px var(--primary), 0 1px 2px 0 var(--shadow);
+}
+.qs-thumb:focus-visible { outline:none; }
+.qs-name { width:6ch; flex:none; font-family:"IBM Plex Mono", ui-monospace, monospace;
+           font-size:12px; color:var(--brand); }
+.qs-ticks { display:flex; justify-content:space-between; width:126px; margin:7px 0 0 74px;
+            font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10px; color:var(--dim); }
+.qs-ticks span { width:3ch; }
+.qs-ticks span:nth-child(2) { text-align:center; }
+.qs-ticks span:last-child { text-align:right; }
+
+/* ---- A: as shipped. Only the handle answers, and only under the pointer. ---- */
+.v-a .qs-thumb { transition: box-shadow 150ms cubic-bezier(.4,0,.2,1); }
+.v-a .qs-thumb:hover, .v-a .qs-thumb:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--primary),
+              0 0 0 4px color-mix(in srgb, var(--ring) 50%, transparent),
+              0 1px 2px 0 var(--shadow);
+}
+
+/* ---- B: one idea - the whole control wakes up, nothing moves. ---- */
+.v-b .qs-thumb { transition: box-shadow 140ms cubic-bezier(.2,.8,.2,1); }
+.v-b .qs-name  { opacity:.72; transition: opacity 140ms cubic-bezier(.2,.8,.2,1); }
+.v-b .qs:hover .qs-thumb {
+  box-shadow: inset 0 0 0 1px var(--primary),
+              0 0 0 4px color-mix(in srgb, var(--ring) 50%, transparent),
+              0 1px 2px 0 var(--shadow);
+}
+.v-b .qs:hover .qs-name { opacity:1; }
+
+/* ---- C: one idea - the handle grows. ---- */
+.v-c .qs-thumb { transition: transform 180ms cubic-bezier(.2,.8,.2,1),
+                             box-shadow 180ms cubic-bezier(.2,.8,.2,1); }
+.v-c .qs:hover .qs-thumb {
+  transform: scale(1.12);
+  box-shadow: inset 0 0 0 1px var(--primary),
+              0 0 0 4px color-mix(in srgb, var(--ring) 50%, transparent),
+              0 1px 2px 0 var(--shadow);
+}
+
+/* ---- D: one idea - the groove swells under the pointer. ---- */
+.v-d .qs-groove, .v-d .qs-fill { transition: transform 200ms cubic-bezier(.2,.8,.2,1); }
+.v-d .qs:hover .qs-groove, .v-d .qs:hover .qs-fill { transform: scaleY(1.9); }
+
+/* =========================================================================
+   Reduced motion. The same rule index.css already ships globally, plus the
+   transforms: B, C and D degrade to A's instant change, and so does A.
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation: none !important; }
+  .tile:hover, .tile:hover .shot,
+  .qs:hover .qs-thumb, .qs-thumb:hover,
+  .qs:hover .qs-groove, .qs:hover .qs-fill { transform: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div>
+    <h1>Hover feel &mdash; two picks to make</h1>
+    <p><b>Pick one variant in each section.</b> Only the pick gets built into the app; the other
+    three are thrown away. Hover each tile and each slider with the mouse, in both themes, and
+    choose on feel &mdash; every variant carries the same capture name, the same count and the
+    same placeholder thumbnail, so the only difference you can see is the motion.</p>
+    <p>Variant <b>A</b> is what the app does today, reproduced from the shipped code.
+    <b>B</b>, <b>C</b> and <b>D</b> each carry exactly <b>one</b> idea, and every one of them
+    animates only cheap properties &mdash; <code>transform</code>, <code>opacity</code>,
+    <code>box-shadow</code> &mdash; so nothing here can cost a layout pass on a wall of thirty
+    cards.</p>
+  </div>
+  <button class="switch" id="themeBtn" type="button">Switch to light</button>
+</div>
+
+<section>
+  <h2>1 &mdash; Gallery tile hover</h2>
+  <p>Honest note on A: today's tile does <b>not</b> snap. It already animates &mdash; a 3&nbsp;px
+  lift with a growing shadow over 260&nbsp;ms, and the image pushing in over 420&nbsp;ms on the
+  same curve. What A is, is a <i>combination</i>: two durations, a lift, a shadow, a hairline
+  colour change and a scale, all at once. B, C and D each keep one of those and drop the rest.</p>
+  <div class="row">
+
+    <div class="variant v-a">
+      <div class="chip">A</div>
+      <div class="vtitle">A &mdash; as shipped (lift + push-in)</div>
+      <button class="tile" type="button">
+        <div class="media"><div class="shot"></div><span class="badge">127</span></div>
+        <div class="foot"><div class="fname">hgrc1_A1_sq2.1.tif</div></div>
+      </button>
+      <div class="recipe"><span class="k">tile:</span> transform, box-shadow 260ms cubic-bezier(.16,1,.3,1)
+translateY(-3px) + shadow 0 14px 30px -20px
+inset ring --line -&gt; --line-hi
+<span class="k">image:</span> opacity, transform 420ms cubic-bezier(.16,1,.3,1)
+scale(1.035)</div>
+    </div>
+
+    <div class="variant v-b">
+      <div class="chip">B</div>
+      <div class="vtitle">B &mdash; a fade, nothing moves</div>
+      <button class="tile" type="button">
+        <div class="media"><div class="shot"></div><span class="badge">127</span></div>
+        <div class="foot"><div class="fname">hgrc1_A1_sq2.1.tif</div></div>
+      </button>
+      <div class="recipe"><span class="k">tile:</span> box-shadow 160ms cubic-bezier(.2,.8,.2,1)
+shadow 0 10px 24px -18px, ring -&gt; --line-hi
+<span class="k">image:</span> opacity 160ms cubic-bezier(.2,.8,.2,1)
+opacity .86 -&gt; 1
+no transform anywhere</div>
+    </div>
+
+    <div class="variant v-c">
+      <div class="chip">C</div>
+      <div class="vtitle">C &mdash; a small lift</div>
+      <button class="tile" type="button">
+        <div class="media"><div class="shot"></div><span class="badge">127</span></div>
+        <div class="foot"><div class="fname">hgrc1_A1_sq2.1.tif</div></div>
+      </button>
+      <div class="recipe"><span class="k">tile:</span> transform, box-shadow 160ms cubic-bezier(.2,.8,.2,1)
+translateY(-2px) + shadow 0 12px 26px -18px
+inset ring --line -&gt; --line-hi
+<span class="k">image:</span> untouched</div>
+    </div>
+
+    <div class="variant v-d">
+      <div class="chip">D</div>
+      <div class="vtitle">D &mdash; the image breathes, the frame is still</div>
+      <button class="tile" type="button">
+        <div class="media"><div class="shot"></div><span class="badge">127</span></div>
+        <div class="foot"><div class="fname">hgrc1_A1_sq2.1.tif</div></div>
+      </button>
+      <div class="recipe"><span class="k">image:</span> transform 200ms cubic-bezier(.2,.8,.2,1)
+scale(1.015)
+<span class="k">tile:</span> box-shadow 200ms cubic-bezier(.2,.8,.2,1)
+inset ring --line -&gt; --line-hi only, no lift</div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>2 &mdash; Quality slider hover</h2>
+  <p>Three rungs, and the middle one is the default: <b>Quick</b> (1), <b>Normal</b> (2),
+  <b>Finest</b> (3). Honest note on A: on hover, today's slider does almost nothing. The groove,
+  the fill, the three stops and the rung's name have no hover state at all &mdash; only the
+  16&nbsp;px handle does, and only while the pointer is exactly on it. Hover the row first, then
+  the handle itself, to feel what is missing.</p>
+  <div class="row">
+
+    <div class="variant v-a">
+      <div class="chip">A</div>
+      <div class="vtitle">A &mdash; as shipped (handle only)</div>
+      <div class="qs">
+        <span class="qs-cap">Quality</span>
+        <div class="qs-wrap">
+          <span class="qs-groove"></span><span class="qs-fill"></span>
+          <span class="qs-dots"><span class="qs-dot on"></span><span class="qs-dot on"></span><span class="qs-dot"></span></span>
+          <span class="qs-thumb" tabindex="0" role="slider" aria-label="Quality level"
+                aria-valuemin="1" aria-valuemax="3" aria-valuenow="2" aria-valuetext="Normal"></span>
+        </div>
+        <span class="qs-name">Normal</span>
+      </div>
+      <div class="qs-ticks"><span>Quick</span><span>Normal</span><span>Finest</span></div>
+      <div class="recipe"><span class="k">handle:</span> box-shadow 150ms cubic-bezier(.4,0,.2,1)
+ring 4px --ring/50, on handle :hover only
+<span class="k">groove, stops, rung name:</span> no hover state</div>
+    </div>
+
+    <div class="variant v-b">
+      <div class="chip">B</div>
+      <div class="vtitle">B &mdash; the control wakes, nothing moves</div>
+      <div class="qs">
+        <span class="qs-cap">Quality</span>
+        <div class="qs-wrap">
+          <span class="qs-groove"></span><span class="qs-fill"></span>
+          <span class="qs-dots"><span class="qs-dot on"></span><span class="qs-dot on"></span><span class="qs-dot"></span></span>
+          <span class="qs-thumb" tabindex="0" role="slider" aria-label="Quality level"
+                aria-valuemin="1" aria-valuemax="3" aria-valuenow="2" aria-valuetext="Normal"></span>
+        </div>
+        <span class="qs-name">Normal</span>
+      </div>
+      <div class="qs-ticks"><span>Quick</span><span>Normal</span><span>Finest</span></div>
+      <div class="recipe"><span class="k">on row hover:</span>
+handle box-shadow 140ms cubic-bezier(.2,.8,.2,1)
+rung name opacity 140ms cubic-bezier(.2,.8,.2,1)
+opacity .72 -&gt; 1, no transform</div>
+    </div>
+
+    <div class="variant v-c">
+      <div class="chip">C</div>
+      <div class="vtitle">C &mdash; the handle grows</div>
+      <div class="qs">
+        <span class="qs-cap">Quality</span>
+        <div class="qs-wrap">
+          <span class="qs-groove"></span><span class="qs-fill"></span>
+          <span class="qs-dots"><span class="qs-dot on"></span><span class="qs-dot on"></span><span class="qs-dot"></span></span>
+          <span class="qs-thumb" tabindex="0" role="slider" aria-label="Quality level"
+                aria-valuemin="1" aria-valuemax="3" aria-valuenow="2" aria-valuetext="Normal"></span>
+        </div>
+        <span class="qs-name">Normal</span>
+      </div>
+      <div class="qs-ticks"><span>Quick</span><span>Normal</span><span>Finest</span></div>
+      <div class="recipe"><span class="k">on row hover:</span>
+handle transform, box-shadow 180ms cubic-bezier(.2,.8,.2,1)
+scale(1.12) + ring 4px --ring/50
+groove and rung name untouched</div>
+    </div>
+
+    <div class="variant v-d">
+      <div class="chip">D</div>
+      <div class="vtitle">D &mdash; the groove swells</div>
+      <div class="qs">
+        <span class="qs-cap">Quality</span>
+        <div class="qs-wrap">
+          <span class="qs-groove"></span><span class="qs-fill"></span>
+          <span class="qs-dots"><span class="qs-dot on"></span><span class="qs-dot on"></span><span class="qs-dot"></span></span>
+          <span class="qs-thumb" tabindex="0" role="slider" aria-label="Quality level"
+                aria-valuemin="1" aria-valuemax="3" aria-valuenow="2" aria-valuetext="Normal"></span>
+        </div>
+        <span class="qs-name">Normal</span>
+      </div>
+      <div class="qs-ticks"><span>Quick</span><span>Normal</span><span>Finest</span></div>
+      <div class="recipe"><span class="k">on row hover:</span>
+groove + fill transform 200ms cubic-bezier(.2,.8,.2,1)
+scaleY(1.9) - the 3px line thickens, its height
+never changes, so nothing reflows
+handle and rung name untouched</div>
+    </div>
+
+  </div>
+</section>
+
+<div class="note">
+  <b>Reduced motion.</b> Under <code>@media (prefers-reduced-motion: reduce)</code> every added
+  transform in B, C and D is dropped and all transition durations collapse to
+  <code>.01ms</code>, so all four variants degrade to the same instant state change &mdash; the
+  same rule <code>web/src/index.css</code> already ships globally. Turn the OS setting on and
+  re-open this file to check it.<br><br>
+  <b>Hairlines.</b> Every rounded box on this page, in every state, carries
+  <code>border: 1px solid transparent</code> plus
+  <code>box-shadow: inset 0 0 0 1px &lt;colour&gt;</code> &mdash; never a coloured CSS border.
+  That is the 2026-09-19 Gecko/WebRender seam rule, and each hovered state re-states its inset
+  ring rather than inheriting it, because a <code>box-shadow</code> list is replaced wholesale,
+  not merged.<br><br>
+  <b>Standalone.</b> No build step, no framework, no CDN, no network. Token values are copied by
+  value out of <code>web/src/index.css</code>; the thumbnail is CSS gradients, not a file from
+  <code>data/</code>. Nothing here imports from or affects the app.
+</div>
+
+<script>
+// Light/dark switch: flips data-theme on :root between the app's default dark
+// palette and its "paper" light one. Both themes must read correctly.
+var btn = document.getElementById("themeBtn")
+btn.addEventListener("click", function () {
+  var light = document.documentElement.getAttribute("data-theme") === "paper"
+  document.documentElement.setAttribute("data-theme", light ? "dark-default" : "paper")
+  btn.textContent = light ? "Switch to light" : "Switch to dark"
+})
+</script>
+</body>
+</html>

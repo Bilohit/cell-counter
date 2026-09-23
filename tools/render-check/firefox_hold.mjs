@@ -1,0 +1,18 @@
+import { firefox } from 'playwright';
+import { fileURLToPath } from 'node:url';
+const T = fileURLToPath(new URL('../../data/tif/hemo1 ha1 ', import.meta.url));
+const browser = await firefox.launch({ headless: false });
+const ctx = await browser.newContext({ viewport: { width: 1400, height: 900 }, deviceScaleFactor: 1 });
+const page = await ctx.newPage();
+await page.goto('http://127.0.0.1:8477/');
+await page.setInputFiles('input[type=file]', [T + 'sq2.1.tif', T + 'sq2.2.tif', T + 'sq1.1.tif']);
+await page.getByRole('button', { name: /Count 3/ }).waitFor({ timeout: 120000 });
+await page.waitForTimeout(1500);
+console.log('confirm-ready');
+await page.waitForTimeout(25000);
+await page.getByRole('button', { name: /Count 3/ }).click();
+await page.locator('[role=group][aria-label]').first().waitFor({ timeout: 120000 });
+await page.waitForTimeout(1500);
+console.log('overlap-ready');
+await page.waitForTimeout(25000);
+await browser.close();

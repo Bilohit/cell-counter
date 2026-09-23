@@ -1,0 +1,29 @@
+{
+ "thr": 0.58,
+ "channels": "C",
+ "fold": "all",
+ "iters": 8000,
+ "sigma": 3.0,
+ "min_dist": 6,
+ "ensemble": [
+  "cellnet.onnx",
+  "cellnet_s1.onnx",
+  "cellnet_s2.onnx"
+ ],
+ "thr_note": "picked for the 3-model base-24 ensemble by tools/pick_ensemble_thr.py; averaging lowers peak heights, so a single model's threshold is wrong here",
+ "thr_level": {
+  "1": 0.59,
+  "2": 0.58,
+  "3": 0.57
+ },
+ "thr_level_note": "one (thr, crowd_b) pair per quality level, for that level's own inference path (1 = 1 model, 2 = 3 models, 3 = 3 models + TTA). A peak must clear thr + crowd_b * (neighbours within crowd_r px). RENUMBERED 2026-09-21 when the classical rung was removed: old keys 2/3/4 became 1/2/3 and every VALUE is unchanged, because each new key names the same inference path its old number named - no refit was run and none is owed. The values were picked 2026-09-17 by tools/pick_ensemble_thr.py on mean per-tile |count error|, not F1, and are KEPT UNCHANGED through the 2026-09-18 retrain on the corrected GT - see crowd_note for why the refit was measured and discarded. Re-pick every level whenever the MODELS change, then run tools/decode_check.py before trusting the result: the fit alone cannot see a bias.",
+ "base": 24,
+ "crowd_level": {
+  "1": 0.02,
+  "2": 0.02,
+  "3": 0.02
+ },
+ "crowd_r": 30,
+ "crowd_note": "crowding-adaptive decode, ml/peaks.py. All three levels sit on b 0.020: the grouped-CV per-fold fit on the boundary GT averaged 0.024 @ 29 px with a tight spread (b sd 0.004, r sd 4 px), and r is kept at 30 because 29 is inside that spread and a change would not be evidence-backed. CORRECTION 2026-09-18: this note previously claimed a retrain 'LOST (2.17 % against 2.00 %)'. That was never a result - the per-fold spread was measured for the first time on 2026-09-18 at sd 1.01 pp, so a 0.17 pp gap is a fifth of the noise band. Treat no decode or weight comparison under ~1 pp as a result.",
+ "weights_note": "the three ONNX models were retrained 2026-09-18 on the corrected GT (22034 points) and installed, while these constants were deliberately left alone. A refit on the new weights proposed thr 0.54/0.51/0.52 with crowd_b 0.030/0.030/0.025 and was DISCARDED: tools/decode_check.py showed it bought 0.01-0.02 pp of mean |count error| - nothing - while introducing a systematic over-count at every density, worst on sparse tiles (level 3: +1.28 % sparse against +0.12 % for these constants). Lowering thr 0.06 while raising crowd_b 50 % cancels only where neighbour density is high; on a sparse tile the crowd term is ~0 and the change is pure threshold lowering. Mean |count error| takes the absolute value before averaging and is blind to this, which is what selected the refit. Signed error per density tercile on these constants, new weights: level 2 +0.25/-0.05/+0.66, level 3 +0.12/-0.22/-0.18, level 4 +0.15/-0.33/-0.11 %, against +0.35/+1.36/+1.12, +0.60/+0.98/+1.34 and +0.60/+1.09/+1.41 for the weights these replaced. Bias matters more than scatter here because a hemocytometer count averages several squares: scatter cancels across them, a systematic over-count multiplies through into cells/mL. All training-tile numbers, NOT accuracy. Previous weights: backup/2026-09-18-pre-retrain3/."
+}

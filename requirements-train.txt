@@ -1,0 +1,18 @@
+# Training-only deps (never shipped; the release runs onnxruntime).
+# torch: pinned to 2.11.0+cu128 (verified current top build on the cu128 index),
+# the exact wheel ml/runs/loo.md's numbers were trained on. A bare "torch>=2.11"
+# resolves against the default PyPI index, which has no CUDA wheels on Windows;
+# `pip install -r requirements-train.txt` silently installed 2.13.0+cpu on this
+# machine despite an RTX 4070 being present, and ml/train.py died two minutes
+# into a sweep at .pin_memory().to(dev, non_blocking=True) with "Cannot access
+# accelerator device when none is available" (2026-09-19, see
+# tests/ml/test_model.py::test_train_smoke). "+cu128" is a local version label
+# that does not exist on PyPI, so pinning it forces pip onto the extra index
+# below -- there is no CPU wheel it could fall back to silently.
+# Genuinely want CPU-only? Edit the pin on your checkout to `torch==2.11.0`
+# (drop the --extra-index-url line too); don't pass it on the pip command
+# line, since a version pinned twice with different values is a hard conflict.
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0+cu128
+onnx==1.22.0
+onnxscript==0.7.1

@@ -1,0 +1,11 @@
+# Pinned: these are the versions the accuracy table in README.md was measured on,
+# and the versions tools/build_release.py bundles into the shipped zips. Bumping
+# opencv/numpy/scipy/scikit-image means re-running `python score.py` first.
+opencv-python==4.13.0.92
+numpy==2.4.6
+scipy==1.18.1
+scikit-image==0.26.0
+fastapi==0.137.1
+uvicorn==0.49.0
+python-multipart==0.0.32
+onnxruntime==1.27.0   # ML engine runtime (engine=1)
