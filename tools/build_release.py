@@ -180,8 +180,10 @@ MAC_README = """Cell Counter - first run on a Mac
 
    After that first time, a normal double-click works.
 
-3. A black Terminal window opens and your browser goes to the app. Keep the
+3. A Terminal window opens and your browser goes to the app. Keep the
    Terminal window open while you work; closing it quits the app.
+   When you close it, Terminal asks "Do you want to terminate running
+   processes in this window?" - click Terminate. That is how the app stops.
 
 4. To start it in one click from the Desktop: right-click "Start Cell
    Counter.command", choose Make Alias, drag the alias to your Desktop and
@@ -223,57 +225,69 @@ Nothing is uploaded anywhere - the app runs entirely on your own machine.
 # gets a first count out of it.
 USING = """
 
-Using Cell Counter
-==================
+How to count your cells
+=======================
 
-NAME YOUR FILES BY SAMPLE (this makes everything faster)
-   Start every file name with the name of its sample, then a space:
+Step-by-step guide with pictures (scroll down on this page):
+https://github.com/Bilohit/cell-counter
 
-       ha1 sq1.1.tif    ha1 sq1.2.tif    ha1 sq2.1.tif    ...
-       KNT sq1.1.tif    KNT sq1.2.tif    ...
+Words used here:
+   picture  = one image file from the microscope (the app says "capture")
+   square   = one large hemocytometer counting square (4 x 4 small squares)
+   triple line = the three close lines around each large square. Only cells
+              inside it are counted - the standard hemocytometer rule.
 
-   Any word works as the sample name - "ha1", "KNT", "abc" - as long as all
-   captures of one sample start with the same word and it is followed by a
-   space. Capital letters do not matter. The app then only looks for
-   overlapping captures inside each sample, which is much faster on a big
-   folder, and the concentration calculator can work one sample at a time.
+BEFORE YOU START: NAME YOUR PICTURES BY SAMPLE
+   Start every file name with the sample name, then a space:
 
-1. LOAD CAPTURES
-   Drag your TIF files onto the window, or click to browse. You can load a
-   whole folder at once. A confirm screen shows what will be counted.
+       KNT sq1.1.tif    KNT sq1.2.tif    KNT sq2.1.tif    ...
+       ha1 sq1.1.tif    ha1 sq1.2.tif    ...
 
-2. OVERLAPPING CAPTURES ARE HANDLED FOR YOU
-   One 10x capture shows three of the four rows of a large square, so a
-   square is usually captured twice. The app finds the two captures that
-   overlap, joins them, and counts the square once - you never count the
-   overlap twice.
-   On the confirm screen, turn on "Name groups" to use your sample names
-   (it offers itself when your names follow the pattern above). Files named
-   any other way can be grouped by hand: select them and choose "New group".
+   Here "KNT" and "ha1" are the sample names. Any word works, as long as
+   every picture of one sample starts with the same word and it is followed by a
+   space. Capital letters do not matter. The app then keeps each sample
+   apart, works faster, and gives cells/mL per sample.
 
-3. CHOOSE THE QUALITY
-   One slider: Quick, Normal (the default) or Finest. Finest is slowest and
-   most careful - use it for final numbers and crowded slides. Moving the
-   slider does nothing on its own; press Reprocess to count again.
+1. DRAG IN YOUR PICTURES
+   Open your pictures folder in Finder, select all the files (Command-A
+   on a Mac, Ctrl-A on Windows) and drag them onto the big box in the app.
+   Or click the box to pick them. You can load a whole folder at once.
+   A check screen shows your pictures sorted by sample. "Name groups" at
+   the top turns this sorting on or off. Click the green Count button.
 
-4. CHECK AND CORRECT
-   Every counted cell has a dot. Only cells inside the triple boundary line
-   are counted. Click a dot to remove it; click a cell to add one. Your
-   corrections survive cropping, but Reprocess counts from scratch and
-   replaces them.
+2. TWO PICTURES OF ONE SQUARE ARE JOINED
+   At 10x, one picture only fits 3 of a square's 4 rows, so you take two
+   pictures per square that overlap in the middle. The app finds each pair,
+   joins them, and counts the square once. Leave "Merge" chosen and click
+   the green button at the top right.
 
-5. CONCENTRATION
-   The calculator turns counted squares into cells/mL. Type your dilution.
-   It uses complete squares only and tells you which squares it left out
-   and why.
+3. CHECK THE COUNT
+   Click any square to open it. Every counted cell has an orange dot.
+   Zoom in with the + button, or pinch out on the trackpad. Click a cell with no dot to add one; click a
+   wrong dot to remove it. The number updates as you click.
 
-6. SAVE YOUR WORK
-   Export annotated images, a CSV, a PDF report or the cell positions, or
-   save the session to open later. Closing or reloading the browser tab
-   clears the counts, so export or save first.
+4. QUALITY: QUICK, NORMAL OR FINEST
+   The slider at the bottom. Normal is right for everyday counting. Finest
+   is slower and more careful, for final numbers and crowded slides.
+   Moving the slider does not count anything: click the round recount
+   button next to it. Recounting throws away your clicked fixes.
 
-Good captures: focus on the cells, keep the triple line in frame, keep the
-lighting even, and use the TIF straight from the microscope.
+5. GET CELLS/ML
+   Click "Concentration" (bottom right) or the calculator button next to a
+   sample. Type your dilution (for example 2 if you mixed 1:1 with trypan
+   blue; 1 if you did not dilute). It uses complete squares only.
+
+6. SAVE BEFORE YOU CLOSE
+   Closing or reloading the browser tab CLEARS ALL COUNTS.
+   Click Export for a PDF report, a CSV table for Excel, or the pictures
+   with their dots drawn on. Files go to your Downloads folder.
+   "Save session" keeps everything in one file to open again later.
+
+Good pictures: focus on the cells, keep the triple line in the picture,
+keep the light even, use 10x, and use the TIF straight from the microscope.
+
+If the browser does not open by itself, open it and go to
+http://127.0.0.1:8477
 """
 
 

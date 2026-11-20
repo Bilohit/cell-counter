@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 230" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16">
+  <rect width="760" height="230" rx="14" fill="#ffffff"/>
+  <!-- the file name, one box per part -->
+  <g font-family="Consolas, Menlo, monospace" font-size="34" font-weight="700">
+    <rect x="60" y="40" width="96" height="60" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="108" y="82" text-anchor="middle" fill="#1e3a8a">KNT</text>
+    <rect x="164" y="40" width="40" height="60" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="184" y="82" text-anchor="middle" fill="#92400e">␣</text>
+    <rect x="212" y="40" width="80" height="60" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="252" y="82" text-anchor="middle" fill="#14532d">sq1</text>
+    <rect x="300" y="40" width="56" height="60" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+    <text x="328" y="82" text-anchor="middle" fill="#7c2d12">.1</text>
+    <text x="364" y="82" fill="#475569">.tif</text>
+  </g>
+  <!-- labels -->
+  <g stroke="#94a3b8" stroke-width="1.5">
+    <line x1="108" y1="100" x2="108" y2="130"/>
+    <line x1="184" y1="100" x2="184" y2="165"/>
+    <line x1="252" y1="100" x2="252" y2="130"/>
+    <line x1="328" y1="100" x2="328" y2="165"/>
+  </g>
+  <text x="60" y="150" font-weight="700" fill="#1e3a8a">sample name</text>
+  <text x="140" y="185" font-weight="700" fill="#92400e">a space</text>
+  <text x="222" y="150" font-weight="700" fill="#14532d">square 1</text>
+  <text x="300" y="185" font-weight="700" fill="#7c2d12">picture 1 (top) or 2 (bottom)</text>
+
+  <text x="480" y="60" fill="#0f172a" font-weight="700">The only rule:</text>
+  <text x="480" y="84" fill="#0f172a">start with the sample name</text>
+  <text x="480" y="106" fill="#0f172a">and a space.</text>
+  <text x="480" y="134" fill="#475569">The rest is up to you.</text>
+  <text x="60" y="215" fill="#475569">Every picture of one sample must start with the same word.</text>
+</svg>
